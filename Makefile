@@ -1,2 +1,2 @@
 run:
-	flask run
+	flask run --debug
