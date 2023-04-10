@@ -43,11 +43,10 @@ def decode_publicKey(publicKey_encoded):
     except:
         print("encode_key error: Invalid keys")
 
-
 def encode_kfrags(kfrags = []):
     try:
-        kfrag_bytes_list = [bytes(kfrag) for kfrag in kfrags[:1]]
-        kfrags_joined_bytes = b','.join(kfrag_bytes_list)
+        kfrag_bytes_list = [bytes(kfrag) for kfrag in kfrags]
+        kfrags_joined_bytes = b'-\\-#-\\-'.join(kfrag_bytes_list)
         kfrags_encoded = base64.b64encode(kfrags_joined_bytes).decode('utf-8')
         return kfrags_encoded
     except:
@@ -56,11 +55,11 @@ def encode_kfrags(kfrags = []):
 def decode_kfrags(kfrags_encoded = []):
     try:
         kfrags_joined_bytes = base64.b64decode(kfrags_encoded.encode())
-        kfrag_bytes_list = kfrags_joined_bytes.split(b',')
-        kfrags = [KeyFrag.from_bytes(kfrag_bytes) for kfrag_bytes in kfrag_bytes_list]
+        kfrag_bytes_list = kfrags_joined_bytes.split(b'-\\-#-\\-')
+        kfrags = [VerifiedKeyFrag.from_verified_bytes(kfrag_bytes) for kfrag_bytes in kfrag_bytes_list]
         return kfrags
     except:
-        print("encode_key error: Invalid keys")
+        print("decode_key error: Invalid keys")
 
 def encrypt_text(text, public_key, encoded = False):
     binary_text = text.encode()
