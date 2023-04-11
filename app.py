@@ -1,12 +1,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 def create_app(config_filename):
     app = Flask(__name__)
     app.config.from_object(config_filename)
-
+    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+    
     from routes import api_bp
     app.register_blueprint(api_bp, url_prefix='')
     

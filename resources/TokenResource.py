@@ -5,6 +5,7 @@ from marshmallow import ValidationError
 
 import json
 import uuid
+import jwt
 
 tokens_schema = TokenSchema(many=True)
 token_schema = TokenSchema()
@@ -12,7 +13,7 @@ token_schema = TokenSchema()
 class TokenResource(Resource):
     def get(self):
         tokens = Token.query.all()
-        tokens = tokens_schema.dump(tokens).data
+        tokens = tokens_schema.dump(tokens)
         return tokens, 200
 
     def post(self):

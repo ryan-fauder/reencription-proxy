@@ -13,10 +13,10 @@ class RecordResource(Resource):
         doctor_token = Token.query.filter_by(token=token).first()
         if doctor_token == None:
             return json.dumps({'message': 'Invalid token!'}), 404
-        
+        print(doctor_token)
         result = token_schema.dump(doctor_token)
 
         if result['doctor_id'] == int(doctor_id):
-            return json.dumps({'message': 'Access granted!', 'data': result}), 200
+            return json.dumps({'message': 'Access granted!', 'data': result})
         else:
             return json.dumps({'message': 'Invalid token!'}), 401
