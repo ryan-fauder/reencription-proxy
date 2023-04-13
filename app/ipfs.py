@@ -1,20 +1,42 @@
 import requests
 import json
+from config import IPFS_BASE_URL
 
-# Define a URL da API Gateway do IPFS
-ipfs_api_url = "http://127.0.0.1:8080/api/v0/add"
+def add(file) -> str:
+    response = requests.post(f"{IPFS_BASE_URL}/add", files={"file": file}, params={'cid-version': 1})
 
-# Define o caminho do arquivo a ser enviado para o IPFS
-file_path = "/path/to/file"
+    if response.status_code != 200:
+        print(f"Erro ao obter arquivo do IPFS: {response.content}")
+        return
 
-# Faz a requisição POST para enviar o arquivo para o IPFS
-with open(file_path, "rb") as f:
-    response = requests.post(ipfs_api_url, files={"file": f})
-    
-# Extrai o hash do arquivo do corpo da resposta
-if response.status_code == 200:
     data = json.loads(response.content)
-    hash = data["Hash"]
-    print(f"Arquivo enviado com sucesso! Hash: {hash}")
-else:
-    print(f"Erro ao enviar arquivo para o IPFS: {response.content}")
+    return data["Hash"]
+
+def get(cid: str) -> dict:
+    params = {'arg': cid, 'archive': True, 'compress': True}
+
+    response = requests.post(f"{IPFS_BASE_URL}/get", params=params)
+    if response.status_code != 200:
+        print(f"Erro ao obter arquivo do IPFS: {response.content}")
+        return
+    try:
+        import tarfile, io
+        with tarfile.open(fileobj=io.BytesIO(response.content),mode='r:gz') as tar: #Compression Error
+            filename = tar.getnames()[0]
+            file = tar.extractfile(filename) # KeyError
+            content: bytes = file.read()
+        return json.loads(content)
+    except tarfile.BadGzipFile:
+        print("Erro ao obter arquivo do IPFS: Não foi possível realizar leitura do arquivo - Arquivo não é Gzip")
+    except KeyError:
+        print(f"Erro ao obter arquivo do IPFS: Não foi possível extrair arquivo {filename} - Arquivo não existe")
+
+        
+def main():
+    file_path = "./examples/record.txt"
+    with open(file_path, "rb") as file:
+        cid = add(file)
+        content = get(cid)
+        print(content)
+
+main()
