@@ -49,6 +49,7 @@ def test_instance():
   with open(SC_FILE_STORAGE, 'r') as file:
       token_obj = json.load(file)
   print("Token obtido do armazenamento do SC")
+  
   # Criando o armazenamento do Doutor:
   with open(DOCTOR_FILE_STORAGE, 'r') as file:
     doctor_key_encoded = json.load(file)
@@ -67,13 +68,7 @@ def test_instance():
   ciphertext = encryption.decode_cipher(ipfs_obj['content'])
   print("Cifra e capsula obtidas do IPFS")
 
-  cfrags = encryption.get_cfrags(
-      public_key_signer_patient,
-      public_key_patient,
-      public_key_doctor, 
-      capsule,
-      kfrags=key_frag,
-      )
+  cfrags = encryption.get_cfrags(public_key_signer_patient, public_key_patient, public_key_doctor, capsule, kfrags=key_frag, )
   content: bytes = encryption.decrypt_reencrypted_bytes(
                               doctor_keys["secret_key"],
                               public_key_patient,
