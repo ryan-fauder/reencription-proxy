@@ -31,6 +31,16 @@ def get(cid: str) -> dict:
     except KeyError:
         print(f"Erro ao obter arquivo do IPFS: Não foi possível extrair arquivo {filename} - Arquivo não existe")
 
+def write(cid: str, path: str) -> None:
+    params = {'arg': cid, 'archive': True, 'compress': True}
+
+    response = requests.post(f"{IPFS_BASE_URL}/get", params=params)
+    if response.status_code != 200:
+        print(f"Erro ao obter arquivo do IPFS: {response.content}")
+        return
+    with open(f"{path}/output.tar.gz", 'wb') as file:
+        file.write(response.content)
+
         
 def main():
     file_path = "./examples/record.txt"
@@ -38,5 +48,9 @@ def main():
         cid = add(file)
         content = get(cid)
         print(content)
-
-main()
+    hash = add(json.dumps({"nome": "Lucas"}))
+    print(hash)
+    content = get(hash)
+    print(content)
+if __name__ == "__main__":
+    main()

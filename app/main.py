@@ -1,40 +1,14 @@
+from config import BASE_URL, SC_FILE_STORAGE
+from pprint import pprint
 import requests
 import json
 import encryption
-from config import BASE_URL
-from umbral import Signer
-from pprint import pprint
 
-SC_FILE_STORAGE = "sc_storage.txt"
-IPFS_URL = ""
-
-def sc_generate_storage():
-  patient_keys = encryption.keygen()
-  doctor_keys = encryption.keygen()
-  patient_signer_keys = encryption.keygen()
-  patient_signer = Signer(patient_signer_keys['secret_key'])
-  doctor_id="1"
-  key_frags = patient_grants_acess(patient_keys['secret_key'], patient_signer, doctor_keys['public_key'], 1, 1)
-  
-  data = {
-    'doctor_id': doctor_id,
-    'public_key_patient': encryption.encode_publicKey(patient_keys['public_key']), 
-    'public_key_doctor': encryption.encode_publicKey(doctor_keys['public_key']), 
-    'key_frag':  encryption.encode_kfrags(key_frags), 
-    'link': "ipfs"
-  }
-
-  # Armazenando no arquivo
-  with open(SC_FILE_STORAGE, 'w') as file:
-      json.dump(data, file, indent=4)
 
 def sc_get_storage():
     with open(SC_FILE_STORAGE, 'r') as file:
       data = json.load(file)
     return data
-
-def patient_grants_acess(patient_secret_key, patient_signer, doctor_public_key, required_frags, total_frags):
-  return encryption.grant_acess(patient_secret_key, patient_signer, doctor_public_key, required_frags, total_frags)
 
 def sc_sends_request(data: dict):
   json_data = json.dumps(data)
@@ -55,13 +29,11 @@ def main():
   # o SC ira pedir um token de acesso do medico para a proxy
   print("SC buscando todas as informações")
   sc_request_data = sc_get_storage()
-  print("Informações obtidas")
 
   print("SC requisita token de acesso")
   doctor_id = sc_request_data['doctor_id']
   key_frags = encryption.decode_kfrags(sc_request_data['key_frag'])
   access_token = sc_sends_request(sc_request_data)
-  print("Token de acesso obtido")
 
   # Medico pede documento para a proxy
   doctor_data = {

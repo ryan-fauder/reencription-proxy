@@ -1,7 +1,0 @@
-{
-    "doctor_id": "1",
-    "public_key_patient": "A4u1LJcI14Bu2IY9lJQBaEBKFzx93KdM68sK3Bt+r/ic",
-    "public_key_doctor": "A0RXQimUHByWgld98eENdC8SQ5Frlp5pvuTE+Ky//aVu",
-    "key_frag": "gmyzElOBIStSgqyi3EUEJs9bkQQQ1NdI2I1837fvK0lLSh6FYvU1z05gDZ4Hx2gA+ZpVqh6k/TI6berqOMee5QPd0/1y6Nom2D9GP7Y4TkAq6LNBbBGXWHuukqW/uc7JlwO+yjBbdmUWx3tHep6ruly0xiVlozbfeIHil3OC2BvD7Ov15B23HC28cxe9o1IG0HsN41R9tKA12Iy1CYZrLgHcNIM98JVY5m6KGjR0BG0Y/+4dD0MIKPFz8Cnyqxx4yclhLDiZ8dtfIIXRXXi06i/swjllCEtDPPCkJ8eXr+bq6WututoaM+U5TFnhSu6VweZvtZnj2QmH4WfJhFC5dywbAQE=",
-    "link": "ipfs"
-}

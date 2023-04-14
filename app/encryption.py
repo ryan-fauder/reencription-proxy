@@ -1,5 +1,4 @@
 from umbral import *
-from main import *
 from random import sample
 import base64
 
@@ -14,8 +13,8 @@ def keygen(encoded = False):
 def encode_keys(keys = {}):
     try:
         if(keys == {}): raise Exception("Error")
-        secret_key = base64.b64encode(keys["secret_key"].to_secret_bytes())
-        public_key = base64.b64encode(bytes(keys["public_key"]))
+        secret_key = base64.b64encode(keys["secret_key"].to_secret_bytes()).decode('utf-8')
+        public_key = base64.b64encode(bytes(keys["public_key"])).decode('utf-8')
         return {"public_key": public_key, "secret_key": secret_key}
     except:
         print("encode_key error: Invalid keys")
@@ -23,7 +22,7 @@ def encode_keys(keys = {}):
 def decode_keys(keys = {}):
     try:
         if(keys == {}): raise Exception("Error")
-        secret_key = SecretKey.from_bytes(base64.b64decode(keys["secret_key"]))
+        secret_key = SecretKey.from_bytes(base64.b64decode(keys["secret_key"].encode()))
         public_key = secret_key.public_key()
         return {"public_key": public_key, "secret_key": secret_key}
     except:
@@ -61,23 +60,22 @@ def decode_kfrags(kfrags_encoded = []):
     except:
         print("decode_key error: Invalid keys")
 
-def encrypt_text(text, public_key, encoded = False):
-    binary_text = text.encode()
-    capsule, ciphertext = encrypt(public_key, binary_text)
+def encrypt_bytes(bytes_obj, public_key, encoded = False):
+    capsule, ciphertext = encrypt(public_key, bytes_obj)
     if(encoded):
-        capsule = base64.b64encode(bytes(capsule))
-        ciphertext = base64.b64encode(ciphertext)
+        capsule = base64.b64encode(bytes(capsule)).decode('utf-8')
+        ciphertext = base64.b64encode(ciphertext).decode('utf-8')
     return [capsule, ciphertext]
 
 def decode_capsule(capsule):
-    return Capsule.from_bytes(base64.b64decode(capsule))
+    return Capsule.from_bytes(base64.b64decode(capsule.encode()))
 
 def decode_cipher(ciphertext):
-    return base64.b64decode(ciphertext)
+    return base64.b64decode(ciphertext.encode())
 
-def decrypt_text(capsule, ciphertext, secret_key):
-    binaryText = decrypt_original(secret_key, capsule, ciphertext)
-    return binaryText.decode()
+def decrypt_bytes(capsule, ciphertext, secret_key) -> bytes:
+    bytes_obj = decrypt_original(secret_key, capsule, ciphertext)
+    return bytes_obj
 
 def grant_acess(owner_secret_key, owner_signer, receiving_public_key, required_frags, total_frags):
     return generate_kfrags( delegating_sk=owner_secret_key, 
@@ -104,6 +102,16 @@ def get_cfrags(owner_verifying_key, owner_public_key, receiving_public_key, caps
     ]
     return cfrags
 
+def decrypt_reencrypted_bytes(receiving_secret_key, owner_public_key, capsule, cfrags, ciphertext ):
+    return decrypt_reencrypted(
+                                receiving_sk = receiving_secret_key,
+                                delegating_pk = owner_public_key,
+                                capsule = capsule,
+                                verified_cfrags = cfrags,
+                                ciphertext = ciphertext
+                                )
+
+
 if(__name__=="__main__"):
     # Creating my keys
     # Paciente
@@ -123,12 +131,12 @@ if(__name__=="__main__"):
     #     "key" = "....", // capsule
     #     "content" = "....", // cipher
     # }
-    capsule, ciphertext = encrypt_text(text, person["public_key"])
+    capsule, ciphertext = encrypt_bytes(text.encode(), person["public_key"])
     print(type(capsule))
     print("Capsula: ", capsule)
     print("Cifra: ", ciphertext)
 
-    print("Descriptografado: ", decrypt_text(capsule, ciphertext, person["secret_key"]))
+    print("Descriptografado: ", decrypt_bytes(capsule, ciphertext, person["secret_key"]).decode())
     
     # Creating keys for another person
     # Medico
