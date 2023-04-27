@@ -22,8 +22,9 @@ class TokenResource(Resource):
 
         token = Token(
             doctor_id=data['doctor_id'],
-            public_key_patient=data['public_key_patient'], 
-            public_key_doctor=data['public_key_doctor'], 
+            public_key_patient=data['public_key_patient'],
+            public_key_signer_patient=data['public_key_signer_patient'], 
+            public_key_doctor=data['public_key_doctor'],
             key_frag=data['key_frag'],
             link=data['link']
         )
