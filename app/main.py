@@ -18,8 +18,10 @@ def sc_sends_request(data: dict):
   return token
 
 def doctor_connects_proxy(data):
+  token = data["token"]
   json_data = json.dumps(data)
-  request = requests.post(f"{BASE_URL}/record", data = json_data)
+  headers = {'Authorization': f'Bearer {token}'}
+  request = requests.post(f"{BASE_URL}/record", data = json_data, headers=headers)
   result = request.json()
   dict_result: dict = json.loads(result)
   return dict_result
@@ -59,7 +61,7 @@ def main():
         verified_cfrags = cfrags,
         receiving_sk = doctor_keys["secret_key"], delegating_pk = public_key_patient,
         capsule = capsule, ciphertext = ciphertext
-    )
+  )
   print("Conteudo decodificado por reencriptacao")
   with open("./examples/pdf-example.pdf", "wb") as file:
     file.write(content)
