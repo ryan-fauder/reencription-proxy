@@ -8,10 +8,8 @@ def add(file) -> str:
     if response.status_code != 200:
         print(f"Erro ao obter arquivo do IPFS: {response.content}")
         return
-
     data = json.loads(response.content)
     return data["Hash"]
-
 def get(cid: str) -> dict:
     params = {'arg': cid, 'archive': True, 'compress': True}
 
@@ -40,8 +38,7 @@ def write(cid: str, path: str) -> None:
         return
     with open(f"{path}/output.tar.gz", 'wb') as file:
         file.write(response.content)
-
-        
+       
 def main():
     file_path = "./examples/record.txt"
     with open(file_path, "rb") as file:

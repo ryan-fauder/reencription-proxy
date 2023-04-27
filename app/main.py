@@ -50,14 +50,14 @@ def main():
 
   print(response.keys())
   public_key_patient = PublicKey.from_bytes(deserializeFrom(response["public_key_patient"]))
+  cfrags = deserializeListFrom(VerifiedCapsuleFrag.from_verified_bytes, response["cfrags"])
   capsule = Capsule.from_bytes(deserializeFrom(response["capsule"]))
-  cfrags = deserializeFrom(VerifiedCapsuleFrag.from_verified_bytes, response["cfrags"])
   ciphertext = deserializeFrom(response["ciphertext"])
 
   print("Doutor decodifica o conteúdo")
   content: bytes = decrypt_reencrypted(
         verified_cfrags = cfrags,
-        receiving_sk = doctor_keys["secret_key"],, delegating_pk = public_key_patient,
+        receiving_sk = doctor_keys["secret_key"], delegating_pk = public_key_patient,
         capsule = capsule, ciphertext = ciphertext
     )
   print("Conteudo decodificado por reencriptacao")

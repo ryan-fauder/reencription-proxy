@@ -7,7 +7,6 @@ def keygen(serialized = False):
     secret_key = SecretKey.random()
     public_key = secret_key.public_key()
     keys = {"public_key": public_key, "secret_key": secret_key}
-
     return serializeKeys(keys) if serialized else keys
 
 def serializeKeys(keys = {}):
