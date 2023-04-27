@@ -1,12 +1,12 @@
-from config import BASE_URL, SC_FILE_STORAGE
+from config import BASE_URL, SC_FILE_STORAGE, DOCTOR_FILE_STORAGE
 from pprint import pprint
 import requests
 import json
-import encryption
+from encryption import *
+from umbral import *
 
-
-def sc_get_storage():
-    with open(SC_FILE_STORAGE, 'r') as file:
+def get_storage(path):
+    with open(path, 'r') as file:
       data = json.load(file)
     return data
 
@@ -28,11 +28,11 @@ def main():
   # Ate esse momento, a requisicao do doutor foi processada pela SC
   # o SC ira pedir um token de acesso do medico para a proxy
   print("SC buscando todas as informações")
-  sc_request_data = sc_get_storage()
+  sc_request_data = get_storage(SC_FILE_STORAGE)
 
   print("SC requisita token de acesso")
   doctor_id = sc_request_data['doctor_id']
-  key_frags = encryption.decode_kfrags(sc_request_data['key_frag'])
+  key_frags = deserializeListFrom(VerifiedKeyFrag.from_verified_bytes, sc_request_data['key_frag'])
   access_token = sc_sends_request(sc_request_data)
 
   # Medico pede documento para a proxy
@@ -41,14 +41,29 @@ def main():
     'token': access_token
   }
 
+  print("Doutor obtém suas informações")
+  doctor_key_encoded = get_storage(DOCTOR_FILE_STORAGE)
+  doctor_keys = deserializeKeys(doctor_key_encoded)
+
   print("Doutor inicia conexão com a proxy")
-  document = doctor_connects_proxy(doctor_data)
-  patient_kfrags = encryption.decode_kfrags(document['data']['key_frag'])
-  print("Documento obtido")
+  response = doctor_connects_proxy(doctor_data)['data']
 
-  pprint(document['data'])
-  print(patient_kfrags == key_frags)
+  print(response.keys())
+  public_key_patient = PublicKey.from_bytes(deserializeFrom(response["public_key_patient"]))
+  capsule = Capsule.from_bytes(deserializeFrom(response["capsule"]))
+  cfrags = deserializeFrom(VerifiedCapsuleFrag.from_verified_bytes, response["cfrags"])
+  ciphertext = deserializeFrom(response["ciphertext"])
 
+  print("Doutor decodifica o conteúdo")
+  content: bytes = decrypt_reencrypted(
+        verified_cfrags = cfrags,
+        receiving_sk = doctor_keys["secret_key"],, delegating_pk = public_key_patient,
+        capsule = capsule, ciphertext = ciphertext
+    )
+  print("Conteudo decodificado por reencriptacao")
+  with open("./examples/pdf-example.pdf", "wb") as file:
+    file.write(content)
+  print("Conteudo escrito em um arquivo")
 if(__name__=="__main__"):
   main()
 
