@@ -1,5 +1,5 @@
 # Proxy
--  Identificar partes necessárias do SC.
+- Identificar partes necessárias do SC.
 - Buscar biblioteca python para ipfs
 - Alterar para jwt
 

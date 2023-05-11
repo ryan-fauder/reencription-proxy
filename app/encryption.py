@@ -35,11 +35,11 @@ def deserializeFrom(data: str) -> bytes:
 
 def serializeListFrom(iterable) -> str:
     # Converte uma lista para um formato que pode ser transportado
-    data = [bytes(item) for item in iterable]
-    return serializeFrom(pickle.dumps(data))
+    data = [serializeFrom(bytes(item)) for item in iterable]
+    return data
 
 def deserializeListFrom(function, data: bytes) -> list:
-    iterable = pickle.loads(deserializeFrom(data))
+    iterable = [deserializeFrom(item) for item in data]
     return list(map(function, iterable))
 
 def grant_access(owner_secret_key, owner_signer, receiving_public_key, 
